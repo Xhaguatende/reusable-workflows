@@ -21,7 +21,7 @@ on:
       sonar_exclusions:
         required: false
         type: string
-        default: ""
+        default: "**Program.cs"
       publish_project:
         required: true
         type: string
