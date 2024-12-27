@@ -7,6 +7,10 @@ on:
         required: false
         type: string
         default: "9.x"
+      sonar_cloud_organization:
+        required: false
+        type: string
+        default: "xhaguatende-01"
       sonar_cloud_project_key:
         required: true
         type: string
@@ -105,7 +109,7 @@ jobs:
 
       - name: Begin SonarCloud Scan
         run: |
-          dotnet sonarscanner begin /o:"${{ secrets.SONAR_CLOUD_ORGANIZATION }}" \
+          dotnet sonarscanner begin /o:"${{ inputs.sonar_cloud_organization }}" \
                                   /k:"${{ inputs.sonar_cloud_project_key }}" \
                                   /v:"${{ steps.gitversion.outputs.fullSemVer }}" \
                                   /d:sonar.host.url="${{ secrets.SONAR_CLOUD_URL }}" \
