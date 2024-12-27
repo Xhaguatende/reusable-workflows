@@ -28,9 +28,6 @@ on:
       docker_file:
         required: true
         type: string
-      dockerhub_registry:
-        required: true
-        type: string
       docker_hub_repository:
         required: true
         type: string
