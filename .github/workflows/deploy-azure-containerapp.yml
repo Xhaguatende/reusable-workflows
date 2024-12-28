@@ -31,7 +31,7 @@ jobs:
 
       - name: Deploy to Azure Container App
         run: |
-          echo Deploying version ${{ inputs.fullSemVer }}
+          echo Deploying version: '${{ inputs.fullSemVer }}'
           az containerapp update \
             --name ${{ inputs.azure_containerapp_name }} \
             --resource-group ${{ inputs.azure_resource_group }} \
