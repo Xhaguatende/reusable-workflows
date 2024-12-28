@@ -157,6 +157,7 @@ jobs:
           password: ${{secrets.DOCKERHUB_TOKEN}}
 
       - name: Build and Push Image to Docker Hub Registry
+        if: steps.gitversion.outputs.CommitsSinceVersionSource > 0
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -176,6 +177,7 @@ jobs:
             SOURCE_FOLDER=../output/
 
       - name: Create Release
+        if: steps.gitversion.outputs.CommitsSinceVersionSource > 0
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
