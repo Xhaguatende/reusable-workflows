@@ -55,6 +55,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    outputs:
+      fullSemVer: ${{ steps.gitversion.outputs.fullSemVer }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4

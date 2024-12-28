@@ -1,0 +1,38 @@
+name: Deploy to Azure Container App
+
+on:
+  workflow_call:
+    inputs:
+      azure_containerapp_name:
+        required: true
+        type: string
+      azure_resource_group:
+        required: false
+        type: string
+      docker_hub_repository:
+        required: true
+        type: string
+      fullSemVer:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Container App
+        run: |
+          echo Deploying version ${{ inputs.fullSemVer }}
+          az containerapp update \
+            --name ${{ inputs.azure_containerapp_name }} \
+            --resource-group ${{ inputs.azure_resource_group }} \
+            --image ${{ secrets.DOCKERHUB_USERNAME }}/${{ inputs.docker_hub_repository }}:${{ inputs.fullSemVer }}
