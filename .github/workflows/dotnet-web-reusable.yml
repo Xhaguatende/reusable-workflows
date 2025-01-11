@@ -55,6 +55,7 @@ on:
 
 env:
   BUILD_CONFIGURATION: "Release"
+  ENABLE_QUALITY_GATES: ${{ inputs.enable_quality_gates == 'true' }}
   SHOULD_RELEASE: ${{ inputs.enable_release == 'true' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') }}
   DOCKERFILE_SOURCE_FOLDER: "output"
 
@@ -79,6 +80,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Print Environment Variables
+        run: printenv
+
       - name: Print Input Parameters
         run: |
           echo "enable_quality_gates=${{ inputs.enable_quality_gates }}"
@@ -93,9 +97,6 @@ jobs:
           echo "docker_hub_repository=${{ inputs.docker_hub_repository }}"
           echo "docker_image_title=${{ inputs.docker_image_title }}"
           echo "docker_image_description=${{ inputs.docker_image_description }}"
-
-      - name: Print Environment Variables
-        run: printenv
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
@@ -132,11 +133,11 @@ jobs:
             ${{ runner.os }}-dotnet-
 
       - name: Install SonarCloud
-        if: inputs.enable_quality_gates == 'true'
+        if: env.ENABLE_QUALITY_GATES == 'true'
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Begin SonarCloud Scan
-        if: inputs.enable_quality_gates == 'true'
+        if: env.ENABLE_QUALITY_GATES == 'true'
         run: |
           dotnet sonarscanner begin /o:"${{ inputs.sonar_cloud_organization }}" \
                                   /k:"${{ inputs.sonar_cloud_project_key }}" \
@@ -152,7 +153,7 @@ jobs:
         run: dotnet build --no-restore --configuration ${{ env.BUILD_CONFIGURATION }} -p:GeneratePackageOnBuild=false
 
       - name: Test Solution
-        if: inputs.enable_quality_gates == 'true'
+        if: env.ENABLE_QUALITY_GATES == 'true'
         run: |
           dotnet test --no-restore --no-build --verbosity normal --configuration ${{ env.BUILD_CONFIGURATION }} \
                   /p:CollectCoverage=true \
@@ -162,15 +163,17 @@ jobs:
                   -m:1
 
       - name: End SonarCloud Scan
-        if: inputs.enable_quality_gates == 'true'
+        if: env.ENABLE_QUALITY_GATES == 'true'
         run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish App
+        if: env.SHOULD_RELEASE == 'true'
         run: dotnet publish ${{inputs.publish_project}} --no-build --configuration ${{ env.BUILD_CONFIGURATION }} --output ./../${{env.DOCKERFILE_SOURCE_FOLDER}}/
 
       - name: Login to Docker Hub Registry
+        if: env.SHOULD_RELEASE == 'true'
         uses: docker/login-action@v3
         with:
           username: ${{secrets.DOCKERHUB_USERNAME}}
@@ -196,11 +199,7 @@ jobs:
           build-args: |
             SOURCE_FOLDER=../${{env.DOCKERFILE_SOURCE_FOLDER}}/
 
-      - name: Create Release
-        if: env.SHOULD_RELEASE == 'true'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.gitversion.outputs.fullSemVer }}
-          release_name: Release ${{ steps.gitversion.outputs.fullSemVer }}
+      - name: Create GitHub Release
+        run: |
+          gh release create v${{ secrets.GITHUB_TOKEN }} \
+            --title "Release ${{ steps.gitversion.outputs.fullSemVer }}" \
