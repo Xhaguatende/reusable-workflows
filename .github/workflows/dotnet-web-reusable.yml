@@ -55,8 +55,8 @@ on:
 
 env:
   BUILD_CONFIGURATION: "Release"
-  ENABLE_QUALITY_GATES: ${{ inputs.enable_quality_gates == 'true' }}
-  SHOULD_RELEASE: ${{ inputs.enable_release == 'true' || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') }}
+  ENABLE_QUALITY_GATES: ${{ inputs.enable_quality_gates == true }}
+  SHOULD_RELEASE: ${{ inputs.enable_release == true || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') }}
   DOCKERFILE_SOURCE_FOLDER: "output"
 
 defaults:
