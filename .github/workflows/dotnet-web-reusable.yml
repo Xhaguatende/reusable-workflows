@@ -15,6 +15,10 @@ on:
         required: false
         type: string
         default: "9.x"
+      tests_parameters:
+        required: false
+        type: string
+        default: "/p:CollectCoverage=true /p:CoverletOutputFormat=opencover"
       sonar_cloud_organization:
         required: false
         type: string
@@ -93,6 +97,7 @@ jobs:
           echo "enable_quality_gates=${{ inputs.enable_quality_gates }}"
           echo "enable_release=${{ inputs.enable_release }}"
           echo "dotnet_version=${{ inputs.dotnet_version }}"
+          echo "tests_parameters=${{ inputs.tests_parameters }}"
           echo "sonar_cloud_organization=${{ inputs.sonar_cloud_organization }}"
           echo "sonar_cloud_project_key=${{ inputs.sonar_cloud_project_key }}"
           echo "sonar_coverage_exclusions=${{ inputs.sonar_coverage_exclusions }}"
@@ -160,12 +165,7 @@ jobs:
       - name: Test Solution
         if: env.ENABLE_QUALITY_GATES == 'true'
         run: |
-          dotnet test --no-restore --no-build --verbosity normal --configuration ${{ env.BUILD_CONFIGURATION }} \
-                  /p:CollectCoverage=true \
-                  /p:CoverletOutput=../CoverageResults/ \
-                  /p:MergeWith="../CoverageResults/coverage.json" \
-                  /p:CoverletOutputFormat="opencover,json" \
-                  -m:1
+          dotnet test --no-restore --no-build --verbosity normal --configuration ${{ env.BUILD_CONFIGURATION }} ${{ inputs.tests_parameters }}
 
       - name: End SonarCloud Scan
         if: env.ENABLE_QUALITY_GATES == 'true'
