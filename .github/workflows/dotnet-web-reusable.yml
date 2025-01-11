@@ -86,7 +86,7 @@ jobs:
       - name: Print Input Parameters
         run: |
           echo "enable_quality_gates=${{ inputs.enable_quality_gates }}"
-          echo "enable_quality_gates_1=${{ inputs.enable_quality_gates == 'true' }}"
+          echo "enable_quality_gates_1=${{ inputs.enable_quality_gates == true }}"
           echo "enable_quality_gates_2=${{ inputs.enable_quality_gates == 'True' }}"
           echo "enable_release=${{ inputs.enable_release }}"
           echo "enable_release_1=${{ inputs.enable_release == 'true' }}"
