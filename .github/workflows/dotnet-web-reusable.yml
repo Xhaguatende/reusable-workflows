@@ -153,7 +153,7 @@ jobs:
                                   /k:"${{ inputs.sonar_cloud_project_key }}" \
                                   /v:"${{ steps.gitversion.outputs.fullSemVer }}" \
                                   /d:sonar.host.url="${{ secrets.SONAR_CLOUD_URL }}" \
-                                  /d:sonar.login="${{ secrets.SONAR_TOKEN }}" \
+                                  /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
                                   /d:sonar.cs.opencover.reportsPaths=./CoverageResults/coverage.opencover.xml \
                                   /d:sonar.coverage.exclusions=${{inputs.sonar_coverage_exclusions}} \
                                   /d:sonar.exclusions=${{inputs.sonar_exclusions}} \
@@ -189,7 +189,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: mongodb-migration-artifacts
-          path: ./../docs/mongodb/migrations/migrations/
+          path: ${{ github.workspace }}/docs/mongodb/migrations/migrations/
 
       - name: Build and Push Image to Docker Hub Registry
         if: env.SHOULD_RELEASE == 'true'
