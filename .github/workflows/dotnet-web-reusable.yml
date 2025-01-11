@@ -3,7 +3,7 @@ name: Build and Push Docker Image
 on:
   workflow_call:
     inputs:
-      enable_quality-gates:
+      enable_quality_gates:
         required: false
         type: boolean
         default: true
@@ -81,7 +81,7 @@ jobs:
 
       - name: Print Input Parameters
         run: |
-          echo "enable_quality-gates=${{ inputs.enable_quality-gates }}"
+          echo "enable_quality_gates=${{ inputs.enable_quality_gates }}"
           echo "enable_release=${{ inputs.enable_release }}"
           echo "dotnet_version=${{ inputs.dotnet_version }}"
           echo "sonar_cloud_organization=${{ inputs.sonar_cloud_organization }}"
@@ -132,11 +132,11 @@ jobs:
             ${{ runner.os }}-dotnet-
 
       - name: Install SonarCloud
-        if: inputs.enable_quality-gates == 'true'
+        if: inputs.enable_quality_gates == 'true'
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Begin SonarCloud Scan
-        if: inputs.enable_quality-gates == 'true'
+        if: inputs.enable_quality_gates == 'true'
         run: |
           dotnet sonarscanner begin /o:"${{ inputs.sonar_cloud_organization }}" \
                                   /k:"${{ inputs.sonar_cloud_project_key }}" \
@@ -152,7 +152,7 @@ jobs:
         run: dotnet build --no-restore --configuration ${{ env.BUILD_CONFIGURATION }} -p:GeneratePackageOnBuild=false
 
       - name: Test Solution
-        if: inputs.enable_quality-gates == 'true'
+        if: inputs.enable_quality_gates == 'true'
         run: |
           dotnet test --no-restore --no-build --verbosity normal --configuration ${{ env.BUILD_CONFIGURATION }} \
                   /p:CollectCoverage=true \
@@ -162,7 +162,7 @@ jobs:
                   -m:1
 
       - name: End SonarCloud Scan
-        if: inputs.enable_quality-gates == 'true'
+        if: inputs.enable_quality_gates == 'true'
         run: dotnet sonarscanner end /d:sonar.login="${{ secrets.SONAR_TOKEN }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
