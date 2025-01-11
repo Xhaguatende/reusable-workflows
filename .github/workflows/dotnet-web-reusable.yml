@@ -47,6 +47,10 @@ on:
         required: false
         type: string
         default: "N/A"
+      has_mongodb_migration:
+        required: false
+        type: boolean
+        default: false
 
     outputs:
       version:
@@ -58,6 +62,7 @@ env:
   ENABLE_QUALITY_GATES: ${{ inputs.enable_quality_gates == true }}
   SHOULD_RELEASE: ${{ inputs.enable_release == true || (github.ref == 'refs/heads/main' && github.event_name != 'pull_request') }}
   DOCKERFILE_SOURCE_FOLDER: "output"
+  HAS_MONGODB_MIGRATION: ${{ inputs.has_mongodb_migration == true }}
 
 defaults:
   run:
@@ -178,6 +183,13 @@ jobs:
         with:
           username: ${{secrets.DOCKERHUB_USERNAME}}
           password: ${{secrets.DOCKERHUB_TOKEN}}
+
+      - name: MongoDB Migration Artifacts
+        if: env.SHOULD_RELEASE == 'true' && env.HAS_MONGODB_MIGRATION == 'true'
+        uses: actions/upload-artifact@v3
+        with:
+          name: mongodb-migration-artifacts
+          path: ./../docs/mongodb/migrations/migrations/
 
       - name: Build and Push Image to Docker Hub Registry
         if: env.SHOULD_RELEASE == 'true'
