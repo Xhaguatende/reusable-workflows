@@ -58,7 +58,7 @@ on:
       mongodb_migration_folder:
         required: false
         type: string
-        default: "docs/mongodb/migrations/migrations"
+        default: "docs/mongodb/migrations"
 
     outputs:
       version:
