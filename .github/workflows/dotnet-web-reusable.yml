@@ -200,7 +200,6 @@ jobs:
           push: true
           tags: |
             ${{secrets.DOCKERHUB_USERNAME}}/${{inputs.docker_hub_repository}}:${{ steps.gitversion.outputs.fullSemVer }}
-            ${{secrets.DOCKERHUB_USERNAME}}/${{inputs.docker_hub_repository}}:latest
           labels: |
             org.opencontainers.image.created={{date 'rfc3339'}}
             org.opencontainers.image.version=${{ steps.gitversion.outputs.fullSemVer }}
