@@ -215,5 +215,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create v${{ secrets.GITHUB_TOKEN }} \
-            --title "Release ${{ steps.gitversion.outputs.fullSemVer }}" \
+          gh release create v${{ steps.gitversion.outputs.fullSemVer }} \
+            --title "Release ${{ steps.gitversion.outputs.fullSemVer }}"
