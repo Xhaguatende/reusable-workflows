@@ -223,11 +223,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Compress the folder into a zip file
-          zip -r mongodb-migration-artifacts.zip docs/mongodb/migrations/migrations/
+          zip -r mongodb-migration-artifacts.zip ${{ github.workspace }}/docs/mongodb/migrations/migrations/
 
           # Get the release tag (assuming it's created earlier in the workflow)
           RELEASE_TAG=v${{ steps.gitversion.outputs.fullSemVer }}
 
           # Upload the artifact to the release
           gh release upload "$RELEASE_TAG" mongodb-migration-artifacts.zip --clobber
-
