@@ -55,6 +55,10 @@ on:
         required: false
         type: boolean
         default: false
+      mongodb_migration_folder:
+        required: false
+        type: string
+        default: "docs/mongodb/migrations/migrations"
 
     outputs:
       version:
@@ -107,6 +111,8 @@ jobs:
           echo "docker_hub_repository=${{ inputs.docker_hub_repository }}"
           echo "docker_image_title=${{ inputs.docker_image_title }}"
           echo "docker_image_description=${{ inputs.docker_image_description }}"
+          echo "has_mongodb_migration=${{ inputs.has_mongodb_migration }}"
+          echo "mongodb_migration_folder=${{ inputs.mongodb_migration_folder }}"
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
@@ -184,13 +190,6 @@ jobs:
           username: ${{secrets.DOCKERHUB_USERNAME}}
           password: ${{secrets.DOCKERHUB_TOKEN}}
 
-      - name: MongoDB Migration Artifacts
-        if: env.SHOULD_RELEASE == 'true' && env.HAS_MONGODB_MIGRATION == 'true'
-        uses: actions/upload-artifact@v3
-        with:
-          name: mongodb-migration-artifacts
-          path: ${{ github.workspace }}/docs/mongodb/migrations/migrations/
-
       - name: Build and Push Image to Docker Hub Registry
         if: env.SHOULD_RELEASE == 'true'
         uses: docker/build-push-action@v5
@@ -223,9 +222,9 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Compress the folder into a zip file
-          zip -r mongodb-migration-artifacts.zip ${{ github.workspace }}/docs/mongodb/migrations/migrations/
+          zip -r mongodb-migration-artifacts.zip ${{ github.workspace }}/${{ inputs.mongodb_migration_folder }}/
 
-          # Get the release tag (assuming it's created earlier in the workflow)
+          # Set the release tag 
           RELEASE_TAG=v${{ steps.gitversion.outputs.fullSemVer }}
 
           # Upload the artifact to the release
